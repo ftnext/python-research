@@ -64,6 +64,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | httpx | 0.28.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | aiohttp | 3.14.5 | 4/4 | 成功 | `SSL_CERT_FILE`: 0/4、control成功 |
 | httpx2 | 2.16.0 | 0/4 | 成功 | 既定で拒否のため未実施 |
+| httpxyz | 0.42.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
 
 ## requests 2.34.2
 
@@ -167,6 +168,31 @@ uv run --python 3.14 emudhra-we-have-a-problem/httpx2_checker.py
 
 ```text
 anyio==4.15.1, h11==0.16.0, httpcore2==2.16.0, httpx2==2.16.0, idna==3.20, truststore==0.10.5, typing_extensions==4.16.0
+```
+
+検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
+## httpxyz 0.42.1
+
+certifi 2026.10.19のバンドルを使用。4件とも `code=20: unable to get local issuer certificate`。
+[HTTPXYZの環境変数](https://httpxyz.org/environment_variables/)は `SSL_CERT_FILE` / `SSL_CERT_DIR`。`trust_env` は既定のまま維持している。
+
+```sh
+uv run --python 3.14 emudhra-we-have-a-problem/httpxyz_checker.py
+```
+
+| ホスト | 既定 |
+| --- | --- |
+| dv-g3b-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-aaa-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-noct-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-aaa-noct-emudhra.we-have-a-problem.com | REJECTED |
+| www.python.org | ACCEPTED |
+
+既定設定の終了コード: `0`。実測時の依存パッケージ:
+
+```text
+anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcorexyz==1.2.1, httpxyz==0.42.1, idna==3.20, typing_extensions==4.16.0
 ```
 
 検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
