@@ -65,6 +65,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | aiohttp | 3.14.5 | 4/4 | 成功 | `SSL_CERT_FILE`: 0/4、control成功 |
 | httpx2 | 2.16.0 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | httpxyz | 0.42.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
+| niquests | 3.21.2 | 4/4 | 成功 | `REQUESTS_CA_BUNDLE`: 0/4、control成功 |
 
 ## requests 2.34.2
 
@@ -196,3 +197,55 @@ anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcorexyz==1.2.1, httpxyz==0.
 ```
 
 検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
+## niquests 3.21.2
+
+既定ではwassimaでmacOSのルートを抽出したCAバンドルを使用し、4件とも成功した。
+インストール済み `niquests.adapters.HTTPAdapter.cert_verify()` と `wassima._os._macos` を確認。ルートを抽出してTLSバックエンドへ渡す経路であり、httpx2のmacOSネイティブ信頼性評価と同一ではない。
+Homebrewを `REQUESTS_CA_BUNDLE` で指定すると4件とも `code=20: unable to get local issuer certificate` に変わり、controlは成功。終了コードは `1 → 0`。
+追加比較として `SSL_CERT_FILE` だけをHomebrewに指定した場合は4件とも成功のままで、終了コード `1`。stdlibの表示パスが変わっても、このライブラリのCA切替を意味しない。
+[NiquestsのCA設定](https://niquests.readthedocs.io/en/latest/user/advanced.html#ssl-cert-verification)と[Wassima](https://github.com/jawah/wassima)も参照。
+
+```sh
+uv run --python 3.14 emudhra-we-have-a-problem/niquests_checker.py
+REQUESTS_CA_BUNDLE=/opt/homebrew/etc/ca-certificates/cert.pem \
+  uv run --python 3.14 emudhra-we-have-a-problem/niquests_checker.py
+SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
+  uv run --python 3.14 emudhra-we-have-a-problem/niquests_checker.py
+```
+
+| ホスト | 既定 | Homebrew (`REQUESTS_CA_BUNDLE`) | Homebrew (`SSL_CERT_FILE`のみ) |
+| --- | --- | --- | --- |
+| dv-g3b-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED | ACCEPTED |
+| dv-g3b-aaa-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED | ACCEPTED |
+| dv-g3b-noct-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED | ACCEPTED |
+| dv-g3b-aaa-noct-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED | ACCEPTED |
+| www.python.org | ACCEPTED | ACCEPTED | ACCEPTED |
+
+既定設定の終了コード: `1`。実測時の依存パッケージ:
+
+```text
+charset-normalizer==3.5.2, h11==0.16.0, jh2==5.0.15, niquests==3.21.2, qh3==2.0.4, urllib3-future==2.25.903, wassima==2.1.5
+```
+
+検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
+## CAの内容と結果の解釈
+
+接続実験に加え、同じ環境で各バンドルを `ssl.SSLContext.load_verify_locations()` に読み込み、
+`get_ca_certs()` のsubject commonNameを調べた。wassimaは `generate_ca_bundle()` の戻り値を調べた。
+
+| CAソース | CA数 | emSign ECC Root CA - G3 | AAA Certificate Services |
+| --- | --- | --- | --- |
+| システムPEM | 128 | 含む | 含む |
+| Homebrew PEM | 189 | 含まない | 含まない |
+| certifi 2026.10.19 | 120 | 含まない | 含まない |
+| wassima 2.1.5の生成バンドル | 158 | 含む | 含む |
+
+この実測では **aiohttpとniquestsにデモチェーンを受け入れる挙動があり、適切なCA環境変数でHomebrewを指定すると拒否に変わった**。
+urllibも同じ変化を示した。requests/httpx/httpxyzは今回取得したcertifiで既に拒否し、httpx2はmacOSの検証機能でブロックした。
+「OSの証明書を使う」だけでは、PEMの鮮度やOSのブロック情報が適用されるかは判断できない。
+
+Homebrew・certifiでの `unable to get local issuer certificate` と対象2ルートが含まれない事実は整合する。
+これはルートを除外した今回のチェーンに対する結果であり、すべての侵害中間CA・別チェーン・過去バージョンを網羅しない。
+CAバンドルの差し替えは他サイトの信頼性にも影響し得る。HTTP/2・HTTP/3の各経路や非同期版の別APIは個別に強制して検証していない。
