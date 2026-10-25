@@ -61,6 +61,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | ライブラリ | バージョン | 既定のデモ成功数 | control | Homebrewで再試行 |
 | --- | --- | --- | --- | --- |
 | requests | 2.34.2 | 0/4 | 成功 | 既定で拒否のため未実施 |
+| httpx | 0.28.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
 
 ## requests 2.34.2
 
@@ -83,6 +84,31 @@ uv run --python 3.14 emudhra-we-have-a-problem/requests_checker.py
 
 ```text
 certifi==2026.10.19, charset-normalizer==3.5.2, idna==3.20, requests==2.34.2, urllib3==2.8.0
+```
+
+検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
+## httpx 0.28.1
+
+certifi 2026.10.19のバンドルを使用。4件とも `code=20: unable to get local issuer certificate`。
+[HTTPXの環境変数](https://www.python-httpx.org/environment_variables/)は `SSL_CERT_FILE` / `SSL_CERT_DIR`。`trust_env=False` はCA環境変数も無効化するため使用していない。
+
+```sh
+uv run --python 3.14 emudhra-we-have-a-problem/httpx_checker.py
+```
+
+| ホスト | 既定 |
+| --- | --- |
+| dv-g3b-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-aaa-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-noct-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-aaa-noct-emudhra.we-have-a-problem.com | REJECTED |
+| www.python.org | ACCEPTED |
+
+既定設定の終了コード: `0`。実測時の依存パッケージ:
+
+```text
+anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcore==1.0.9, httpx==0.28.1, idna==3.20, typing_extensions==4.16.0
 ```
 
 検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
