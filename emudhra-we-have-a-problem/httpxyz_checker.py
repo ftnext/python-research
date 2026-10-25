@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.14"
-# dependencies = ["httpxyz==0.42.1"]
+# dependencies = ["httpxyz==0.42.1", "certifi==2026.10.19"]
 # ///
 """Probe eMudhra demo chains and www.python.org using httpxyz's default TLS verifier.
 
