@@ -62,6 +62,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | --- | --- | --- | --- | --- |
 | requests | 2.34.2 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | httpx | 0.28.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
+| aiohttp | 3.14.5 | 4/4 | 成功 | `SSL_CERT_FILE`: 0/4、control成功 |
 
 ## requests 2.34.2
 
@@ -109,6 +110,35 @@ uv run --python 3.14 emudhra-we-have-a-problem/httpx_checker.py
 
 ```text
 anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcore==1.0.9, httpx==0.28.1, idna==3.20, typing_extensions==4.16.0
+```
+
+検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
+## aiohttp 3.14.5
+
+既定はstdlibの `ssl.create_default_context()` からシステムPEMを読み込み、4件とも成功した。
+Homebrew指定では4件とも `code=20: unable to get local issuer certificate` に変わり、controlは成功。終了コードは `1 → 0`。
+[aiohttpのSSL設定](https://docs.aiohttp.org/en/stable/client_advanced.html#ssl-control-for-tcp-sockets)も参照。
+`ClientConnectorCertificateError` は `SSLCertVerificationError` を継承するが `verify_code` 等を持たないため、内包する `certificate_error` を辿って記録する。
+
+```sh
+uv run --python 3.14 emudhra-we-have-a-problem/aiohttp_checker.py
+SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
+  uv run --python 3.14 emudhra-we-have-a-problem/aiohttp_checker.py
+```
+
+| ホスト | 既定 | Homebrew (`SSL_CERT_FILE`) |
+| --- | --- | --- |
+| dv-g3b-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| dv-g3b-aaa-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| dv-g3b-noct-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| dv-g3b-aaa-noct-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| www.python.org | ACCEPTED | ACCEPTED |
+
+既定設定の終了コード: `1`。実測時の依存パッケージ:
+
+```text
+aiohappyeyeballs==2.7.1, aiohttp==3.14.5, aiosignal==1.4.0, attrs==26.1.0, frozenlist==1.8.0, idna==3.20, multidict==7.1.0, propcache==0.5.4, yarl==1.25.1
 ```
 
 検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
