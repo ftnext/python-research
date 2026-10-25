@@ -10,6 +10,7 @@
 | --- | --- | --- | --- |
 | Django | 6.1.2 | 明示設定により可能 | Viewの既定メソッドに含まれない。CSRF検証対象、require_safeも対象外 |
 | Flask | 3.1.3 / Werkzeug 3.1.9 | `methods=["QUERY"]` で可能 | MethodViewのメソッド自動検出には含まれない |
+| Robyn | 0.88.0 | 未対応 | QUERYのルート登録不可。HTTPリクエストも405 |
 
 Starlette・FastAPIは既存調査を参照する（今回の再検証対象外）。
 
@@ -92,3 +93,45 @@ Flask 3.1.3 / Werkzeug 3.1.9: QUERY body=200; GET/auto MethodView=405; OPTIONS A
 ```
 
 Allowのメソッド順序は不定。CORS・CSRF・OpenAPIの拡張パッケージや本番WSGIサーバーのQUERY対応までは、この結果から判断できない。
+
+## Robyn 0.88.0
+
+**結論: 公開APIでQUERYを登録・処理することはできない。**
+
+- `@app.query` も `HttpMethod.QUERY` も存在しない。
+- `app.add_route("QUERY", ...)` は `KeyError("QUERY")` になる。任意文字列をそのままルーターへ渡すAPIではなく、既存メソッドの列挙値へ変換する辞書を通る。
+- Rust側の `HttpMethod` と `is_supported()` にもQUERYがなく、HTTP入口で拒否する。GETで到達できる `/health` に実際のQUERYリクエストを送っても405、本文 `Method not allowed` だった。
+
+したがって専用デコレーターだけの不足ではなく、Python側の登録処理とRust側のメソッド判定・ルーティングにも変更が必要。既存APIの設定変更だけでQUERYに対応するサンプルは用意できないため、代わりに未対応を再確認できるプローブを置く。
+
+根拠: [PyPIの確認版](https://pypi.org/project/robyn/0.88.0/)、[v0.88.0のPython API / add_route](https://github.com/sparckles/Robyn/blob/v0.88.0/robyn/__init__.py)、[HttpMethodの定義・変換・判定](https://github.com/sparckles/Robyn/blob/v0.88.0/src/types/mod.rs)、[メソッド別ルーター](https://github.com/sparckles/Robyn/blob/v0.88.0/src/routers/http_router.rs)、[HTTP入口での判定](https://github.com/sparckles/Robyn/blob/v0.88.0/src/server.rs)。
+
+### 再確認用プローブ
+
+```sh
+uv run --python 3.13 http-query/robyn_probe.py
+# HTTPで確認する場合はサーバーを起動
+uv run --python 3.13 http-query/robyn_probe.py --serve
+```
+
+別ターミナルから送信する。
+
+```sh
+curl -i http://127.0.0.1:8002/health
+curl -i -X QUERY http://127.0.0.1:8002/health \
+  -H 'Content-Type: application/json' -d '{"term":"python"}'
+```
+
+[robyn_probe.py](robyn_probe.py) の確認結果（通常実行、起動ログは省略）:
+
+```text
+Robyn 0.88.0: no HttpMethod.QUERY / app.query; add_route('QUERY', ...) raises KeyError('QUERY')
+```
+
+HTTPでの確認結果: GET `/health` は200、QUERY `/health` は405。QUERY用のハンドラーに到達していないことと整合する。
+
+## 今回の検証範囲と次回更新
+
+3スクリプトとも、記載した `uv run --python 3.13 ...` で実行確認済み。Django・Flaskはテストクライアントの確認に加え、それぞれの開発サーバーをローカルで起動し、標準ライブラリ `http.client` からJSON本文付きQUERYを送って200と応答内容を確認した。Robynも同じクライアントから実サーバーへ送って405を確認した。本番サーバー、ブラウザー、CORSやキャッシュまで含むRFC全体の適合性試験ではない。
+
+次回は調査日、PyPIの最新安定版、スクリプトの固定依存を更新し、同じチェックとHTTPリクエストを再実行する。バージョン更新だけで対応済みとはせず、Djangoのsafe/CSRF判定、FlaskのMethodView自動検出、RobynのPython/Rust両側の対応も再確認する。Starlette・FastAPIを再調査する際は既存記事の結論と新しい版の結果を区別して追記する。
