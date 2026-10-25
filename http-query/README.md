@@ -9,6 +9,7 @@
 | フレームワーク | 確認版 | QUERYの受付・本文処理 | 標準APIなどの制約 |
 | --- | --- | --- | --- |
 | Django | 6.1.2 | 明示設定により可能 | Viewの既定メソッドに含まれない。CSRF検証対象、require_safeも対象外 |
+| Flask | 3.1.3 / Werkzeug 3.1.9 | `methods=["QUERY"]` で可能 | MethodViewのメソッド自動検出には含まれない |
 
 Starlette・FastAPIは既存調査を参照する（今回の再検証対象外）。
 
@@ -56,3 +57,38 @@ Django 6.1.2: QUERY body=200; no CSRF token=403; GET/default View/require_safe=4
 ```
 
 デフォルト設定を示す `/default-class-search`、`require_safe` を示す `/safe-search` も含む。クラスビューのOPTIONSは `Allow: QUERY, OPTIONS` を返す。CORS、キャッシュ、外部プロキシ、本番WSGI/ASGIサーバー、追加パッケージ（Django REST framework等）は今回の確認範囲外。
+
+## Flask 3.1.3 / Werkzeug 3.1.9
+
+**結論: `@app.route(..., methods=["QUERY"])` でQUERYを登録でき、JSON本文も通常のAPIで読める。専用デコレーターの追加を待つ必要はない。**
+
+Flaskの `methods` とWerkzeugの `Rule` はメソッド文字列を受け取るため、QUERY専用の実装がなくてもルーティングできる。`request.get_json()` で本文を処理でき、Flaskが自動提供するOPTIONSのAllowにもQUERYが載る。
+
+ただし `MethodView` の自動検出対象はget・post・head・options・delete・put・trace・patch。`query()` のみを定義するとQUERYのルートにはならず405になる。クラスで `methods = ["QUERY"]` を明示すれば、既存の `dispatch_request()` が `query()` に振り分ける。
+
+根拠: [Flaskの確認版](https://pypi.org/project/Flask/3.1.3/)、[Werkzeugの確認版](https://pypi.org/project/Werkzeug/3.1.9/)、[Flaskルート登録API](https://flask.palletsprojects.com/en/stable/api/#flask.Flask.add_url_rule)、[MethodViewの公式説明](https://flask.palletsprojects.com/en/stable/views/#method-dispatching-and-apis)、[Flask 3.1.3の検出・dispatch実装](https://github.com/pallets/flask/blob/3.1.3/src/flask/views.py)、[Werkzeug 3.1.9のRule実装](https://github.com/pallets/werkzeug/blob/3.1.9/src/werkzeug/routing/rules.py)。
+
+### サンプルと再現方法
+
+```sh
+uv run --python 3.13 http-query/flask_app.py --check
+uv run --python 3.13 http-query/flask_app.py
+```
+
+別ターミナルから送信する。
+
+```sh
+curl -i -X QUERY http://127.0.0.1:8001/search \
+  -H 'Content-Type: application/json' -d '{"term":"python"}'
+curl -i -X OPTIONS http://127.0.0.1:8001/search
+```
+
+[flask_app.py](flask_app.py) は関数ビュー `/search` とMethodView `/class-search` を提供する。両方とも200と `{"method":"QUERY","filters":{"term":"python"}}` を返す。Flask本体にはDjangoのような標準CSRFミドルウェアがなく、この例もCSRF拡張を使用していない。
+
+`--check` の確認結果（Flask test client）:
+
+```text
+Flask 3.1.3 / Werkzeug 3.1.9: QUERY body=200; GET/auto MethodView=405; OPTIONS Allow=QUERY, OPTIONS
+```
+
+Allowのメソッド順序は不定。CORS・CSRF・OpenAPIの拡張パッケージや本番WSGIサーバーのQUERY対応までは、この結果から判断できない。
