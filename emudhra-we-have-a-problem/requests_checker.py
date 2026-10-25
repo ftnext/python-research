@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # /// script
 # requires-python = ">=3.14"
-# dependencies = ["requests==2.34.2"]
+# dependencies = ["requests==2.34.2", "certifi==2026.10.19"]
 # ///
 """Probe eMudhra demo chains and www.python.org using requests's default TLS verifier.
 

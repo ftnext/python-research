@@ -26,7 +26,8 @@
 ## 再実行
 
 リポジトリルートで実行する。各新規スクリプトはPEP 723 inline script metadataで対象ライブラリのバージョンを固定。
-推移依存とPythonのパッチバージョンは固定していないため、再実行時は出力されるバージョンも確認する。
+certifiに依存するスクリプトでは、実測時の仮想環境で確認したcertifiのバージョンも固定する。
+それ以外の推移依存とPythonのパッチバージョンは固定していないため、再実行時は出力されるバージョンも確認する。
 `urllib_checker.py` は既存のstdlibスクリプトをそのまま使用する。
 
 ```sh
@@ -87,6 +88,9 @@ CA証明書をOSから取得することと、接続先チェーンの信頼性�
 httpx2は後者で、niquestsは前者。niquestsの独自OCSP／CRL処理は接続先のleaf証明書を対象とし、チェーン中の全中間CAを順番に失効確認する処理ではない。
 
 ## requests 2.34.2
+
+2026-10-26追記: スクリプト専用のuv仮想環境のインストール済みメタデータで `certifi==2026.10.19` を確認し、inline script metadataにも同じバージョンを明示した。
+固定後は `uv run --offline --python 3.14 <script.py> --help` で依存解決と起動を確認。接続実験の結果は2026-10-25の記録を維持している。
 
 certifi 2026.10.19のバンドルを使用。4件とも `code=20: unable to get local issuer certificate`。
 [RequestsのCA設定](https://requests.readthedocs.io/en/latest/user/advanced/#ssl-cert-verification)は `REQUESTS_CA_BUNDLE`（フォールバックは `CURL_CA_BUNDLE`）。今回は既定で拒否したため切替実測はしていない。
