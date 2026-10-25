@@ -66,6 +66,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | httpx2 | 2.16.0 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | httpxyz | 0.42.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | niquests | 3.21.2 | 4/4 | 成功 | `REQUESTS_CA_BUNDLE`: 0/4、control成功 |
+| urllib3 | 2.8.0 | 4/4 | 成功 | `SSL_CERT_FILE`: 0/4、control成功 |
 
 ## CA取得元と証明書検証の全体像
 
@@ -75,6 +76,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | ライブラリ | 既定のCA取得元 | 接続先の検証 |
 | --- | --- | --- |
 | requests 2.34.2 | certifi | OpenSSL |
+| urllib3 2.8.0（直接使用） | OpenSSLの既定パス | OpenSSL |
 | httpx 0.28.1 | certifi | OpenSSL |
 | aiohttp 3.14.5 | OpenSSLの既定パス | OpenSSL |
 | httpx2 2.16.0 | macOSの信頼ストア | macOS Security framework |
@@ -247,6 +249,46 @@ charset-normalizer==3.5.2, h11==0.16.0, jh2==5.0.15, niquests==3.21.2, qh3==2.0.
 
 検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
 
+## urllib3 2.8.0
+
+`urllib3.PoolManager()` を直接使用し、独自SSLContextやCA指定を渡さず検証した。
+このスクリプト専用のuv環境に入るパッケージは `urllib3==2.8.0` のみで、certifiは導入しない。
+既定では4件ともHTTP 200で接続成功。Homebrewを `SSL_CERT_FILE` で指定すると、
+4件とも `code=20: unable to get local issuer certificate` で拒否され、controlは引き続きHTTP 200。終了コードは `1 → 0`。
+
+インストール済み `urllib3.util.ssl_.ssl_wrap_socket()` のソースを確認すると、
+CAやSSLContextが未指定のときに `SSLContext.load_default_certs()` を呼ぶ。
+このmacOS環境ではOpenSSLの既定パスのシステムPEMを使い、`SSL_CERT_FILE` はOpenSSL経由で反映される。
+Requestsは `requests.adapters.HTTPAdapter.cert_verify()` でcertifiのCAパスをurllib3へ明示的に渡すため、
+同じurllib3 2.8.0でもRequests経由の既定結果とは異なる。
+[urllib3のTLS設定](https://urllib3.readthedocs.io/en/stable/advanced-usage.html#custom-tls-certificates)も参照。
+
+プロキシを使わないPoolManagerで、リダイレクト・リトライ・本文の事前読み込みを無効化。
+レスポンスはヘッダー取得後に閉じる。CA環境変数はスクリプトからAPI引数に変換せず、既定の処理に任せる。
+
+```sh
+uv run --python 3.14 emudhra-we-have-a-problem/urllib3_checker.py
+SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
+  uv run --python 3.14 emudhra-we-have-a-problem/urllib3_checker.py
+```
+
+| ホスト | 既定 | Homebrew (`SSL_CERT_FILE`) |
+| --- | --- | --- |
+| dv-g3b-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| dv-g3b-aaa-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| dv-g3b-noct-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| dv-g3b-aaa-noct-emudhra.we-have-a-problem.com | ACCEPTED | REJECTED |
+| www.python.org | ACCEPTED | ACCEPTED |
+
+実測時の依存パッケージ:
+
+```text
+urllib3==2.8.0
+```
+
+検証: 既定・Homebrew指定での実サーバー5ホストへの接続、構文、ラップされた証明書エラー、
+一般TLS/DNS/タイムアウトをUNKNOWNにする分類、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
 ## CAの内容と結果の解釈
 
 接続実験に加え、同じ環境で各バンドルを `ssl.SSLContext.load_verify_locations()` に読み込み、
@@ -259,7 +301,7 @@ charset-normalizer==3.5.2, h11==0.16.0, jh2==5.0.15, niquests==3.21.2, qh3==2.0.
 | certifi 2026.10.19 | 120 | 含まない | 含まない |
 | wassima 2.1.5の生成バンドル | 158 | 含む | 含む |
 
-この実測では **aiohttpとniquestsにデモチェーンを受け入れる挙動があり、適切なCA環境変数でHomebrewを指定すると拒否に変わった**。
+この実測では **aiohttp・niquests・urllib3にデモチェーンを受け入れる挙動があり、適切なCA環境変数でHomebrewを指定すると拒否に変わった**。
 urllibも同じ変化を示した。requests/httpx/httpxyzは今回取得したcertifiで既に拒否し、httpx2はmacOSの検証機能でブロックした。
 「OSの証明書を使う」だけでは、PEMの鮮度やOSのブロック情報が適用されるかは判断できない。
 
