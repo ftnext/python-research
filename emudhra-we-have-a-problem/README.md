@@ -67,6 +67,23 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | httpxyz | 0.42.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | niquests | 3.21.2 | 4/4 | 成功 | `REQUESTS_CA_BUNDLE`: 0/4、control成功 |
 
+## CA取得元と証明書検証の全体像
+
+実験に使った各スクリプトのuv仮想環境内のソースを確認した結果。
+以下は、このmacOS環境と記載バージョンにおける、CA環境変数や独自SSLContextを指定しない既定設定の経路を示す。
+
+| ライブラリ | 既定のCA取得元 | 接続先の検証 |
+| --- | --- | --- |
+| requests 2.34.2 | certifi | OpenSSL |
+| httpx 0.28.1 | certifi | OpenSSL |
+| aiohttp 3.14.5 | OpenSSLの既定パス | OpenSSL |
+| httpx2 2.16.0 | macOSの信頼ストア | macOS Security framework |
+| httpxyz 0.42.1 | certifi | OpenSSL |
+| niquests 3.21.2 | wassimaがmacOSから抽出 | TLSバックエンド＋独自の条件付き失効確認 |
+
+CA証明書をOSから取得することと、接続先チェーンの信頼性評価をOSに委譲することは異なる。
+httpx2は後者で、niquestsは前者。niquestsの独自OCSP／CRL処理は接続先のleaf証明書を対象とし、チェーン中の全中間CAを順番に失効確認する処理ではない。
+
 ## requests 2.34.2
 
 certifi 2026.10.19のバンドルを使用。4件とも `code=20: unable to get local issuer certificate`。
