@@ -63,6 +63,7 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 | requests | 2.34.2 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | httpx | 0.28.1 | 0/4 | 成功 | 既定で拒否のため未実施 |
 | aiohttp | 3.14.5 | 4/4 | 成功 | `SSL_CERT_FILE`: 0/4、control成功 |
+| httpx2 | 2.16.0 | 0/4 | 成功 | 既定で拒否のため未実施 |
 
 ## requests 2.34.2
 
@@ -139,6 +140,33 @@ SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
 
 ```text
 aiohappyeyeballs==2.7.1, aiohttp==3.14.5, aiosignal==1.4.0, attrs==26.1.0, frozenlist==1.8.0, idna==3.20, multidict==7.1.0, propcache==0.5.4, yarl==1.25.1
+```
+
+検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
+
+## httpx2 2.16.0
+
+インストール済み `httpx2._config.create_ssl_context()` → `httpcore2._ssl.default_ssl_context()` のソースを確認。
+macOSでは `truststore.SSLContext` を使用する。4件ともmacOSの信頼性評価で拒否され、理由は `code=-67820: “<対象ホスト>” certificate is blocked`。
+これはcertifiやシステムPEMだけで検証する経路とは異なる。[httpcore2](https://pypi.org/project/httpcore2/)も参照。
+同ソースは `SSL_CERT_FILE` / `SSL_CERT_DIR` が指定されるとstdlibのSSLContextに切り替えるが、今回は切替実測はしていない。
+
+```sh
+uv run --python 3.14 emudhra-we-have-a-problem/httpx2_checker.py
+```
+
+| ホスト | 既定 |
+| --- | --- |
+| dv-g3b-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-aaa-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-noct-emudhra.we-have-a-problem.com | REJECTED |
+| dv-g3b-aaa-noct-emudhra.we-have-a-problem.com | REJECTED |
+| www.python.org | ACCEPTED |
+
+既定設定の終了コード: `0`。実測時の依存パッケージ:
+
+```text
+anyio==4.15.1, h11==0.16.0, httpcore2==2.16.0, httpx2==2.16.0, idna==3.20, truststore==0.10.5, typing_extensions==4.16.0
 ```
 
 検証: 実サーバー5ホストへの接続、構文、ラップされた証明書エラー（検証属性を持たないラッパーも含む）、一般TLS/DNS/タイムアウトをUNKNOWNにする分類、例外の循環参照、終了コード0/1/2、無効なtimeout（0・負数・NaN・無限大）を確認。
