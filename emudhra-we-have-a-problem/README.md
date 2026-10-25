@@ -117,6 +117,9 @@ certifi==2026.10.19, charset-normalizer==3.5.2, idna==3.20, requests==2.34.2, ur
 
 ## httpx 0.28.1
 
+2026-10-26追記: スクリプト専用のuv仮想環境のインストール済みメタデータで `certifi==2026.10.19` を確認し、inline script metadataにも同じバージョンを明示した。
+固定後は `uv run --offline --python 3.14 <script.py> --help` で依存解決と起動を確認。接続実験の結果は2026-10-25の記録を維持している。
+
 certifi 2026.10.19のバンドルを使用。4件とも `code=20: unable to get local issuer certificate`。
 [HTTPXの環境変数](https://www.python-httpx.org/environment_variables/)は `SSL_CERT_FILE` / `SSL_CERT_DIR`。`trust_env=False` はCA環境変数も無効化するため使用していない。
 
