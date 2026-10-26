@@ -233,7 +233,7 @@ anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcorexyz==1.2.1, httpxyz==0.
 インストール済み `niquests.adapters.HTTPAdapter.cert_verify()` と `wassima._os._macos` を確認。ルートを抽出してTLSバックエンドへ渡す経路であり、httpx2のmacOSネイティブ信頼性評価と同一ではない。
 Homebrewを `REQUESTS_CA_BUNDLE` で指定すると4件とも `code=20: unable to get local issuer certificate` に変わり、controlは成功。終了コードは `1 → 0`。
 追加比較として `SSL_CERT_FILE` だけをHomebrewに指定した場合は4件とも成功のままで、終了コード `1`。stdlibの表示パスが変わっても、このライブラリのCA切替を意味しない。
-[NiquestsのCA設定](https://niquests.readthedocs.io/en/latest/user/advanced.html#ssl-cert-verification)と[Wassima](https://github.com/jawah/wassima)も参照。
+[NiquestsのCA設定](https://niquests.readthedocs.io/en/latest/user/advanced.html#tls-certificate-verification)と[Wassima](https://github.com/jawah/wassima)も参照。
 
 ```sh
 uv run --python 3.14 emudhra-we-have-a-problem/niquests_checker.py
