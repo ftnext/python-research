@@ -1,5 +1,71 @@
 # eMudhra TLS 接続実験
 
+## 2026-10-27追記: Python 3.14.10で再実験
+
+**前回3.14.9で接続できたurllib・aiohttp・niquests・urllib3も、3.14.10では既定設定のままデモ4件すべてを拒否した。**
+全8クライアントの既定設定とHomebrew指定（16条件）、niquestsの `SSL_CERT_FILE` のみ指定（1条件）の計17条件を再実行。
+全条件でデモ4件が `REJECTED`、controlの `www.python.org` はHTTP 200、終了コードは `0`。`UNKNOWN` はなかった。
+各行の拒否理由は、対象デモ4ホストすべてで同じだった（httpx2のメッセージ中のホスト名を除く）。
+
+再実験のきっかけは [CVE-2026-115557](https://www.cve.org/CVERecord?id=CVE-2026-115557) / [gh-160040](https://github.com/python/cpython/issues/160040)。
+[CPythonの修正](https://github.com/python/cpython/pull/160042/files)は、証明書検証時に侵害された中間CAの公開鍵（SPKIのSHA-256）を照合して拒否する。
+同じ鍵を使うクロス署名証明書も対象となる。修正のテストは拒否コード `28`（`X509_V_ERR_CERT_REJECTED`）を確認しており、今回の既定設定での変化と整合する。
+
+### 今回の環境と比較条件
+
+- 実行日: 2026-10-27（JST）。既存の8スクリプトを変更せず使用。
+- uv 0.13.6 (329bf9448 2026-10-26)、uv管理のCPython **3.14.10**（Oct 26 2026ビルド）。再実験では `--python 3.14.10` で明示。
+- macOS 26.7.1 / build 25G241 / Apple Silicon、OpenSSL 3.5.9 (29 Sep 2026)は前回と同じ。
+- システムPEM・Homebrew PEMのSHA-256は下記の前回記録と一致。CAバンドルの更新操作はしていない。
+- 各スクリプトの全インストール済みパッケージの名前・バージョンも、下記の前回記録と一致（certifiは2026.10.19）。
+- CA環境変数4種を解除してから、比較条件の変数だけを指定。プロキシ無効・リダイレクト無効・既定の証明書検証・既定timeout 5秒を維持。
+- 最初のsandbox内実行はcontrolを含めてDNS解決に失敗したため判定に使わず、sandbox外で再実行した結果を以下に記録。
+
+### 前回との比較
+
+`20` = `unable to get local issuer certificate`、`28` = `certificate rejected`、
+`-67820` = macOSの `“<対象ホスト>” certificate is blocked`。
+「前回成功数」は2026-10-25 / Python 3.14.9でのデモ成功数。
+
+| クライアント | 前回の既定成功数 | 今回の既定成功数 | 今回の既定の拒否コード | 今回のHomebrew成功数 / 拒否コード | Homebrew指定変数 |
+| --- | --- | --- | --- | --- | --- |
+| urllib（stdlib） | 4/4 | 0/4 | 28 | 0/4 / 20 | `SSL_CERT_FILE` |
+| requests 2.34.2 | 0/4 | 0/4 | 20 | 0/4 / 20 | `REQUESTS_CA_BUNDLE` |
+| httpx 0.28.1 | 0/4 | 0/4 | 20 | 0/4 / 20 | `SSL_CERT_FILE` |
+| aiohttp 3.14.5 | 4/4 | 0/4 | 28 | 0/4 / 20 | `SSL_CERT_FILE` |
+| httpx2 2.16.0 | 0/4 | 0/4 | -67820 | 0/4 / 20 | `SSL_CERT_FILE` |
+| httpxyz 0.42.1 | 0/4 | 0/4 | 20 | 0/4 / 20 | `SSL_CERT_FILE` |
+| niquests 3.21.2 | 4/4 | 0/4 | 28 | 0/4 / 20 | `REQUESTS_CA_BUNDLE` |
+| urllib3 2.8.0 | 4/4 | 0/4 | 28 | 0/4 / 20 | `SSL_CERT_FILE` |
+
+niquestsに `SSL_CERT_FILE` だけをHomebrewへ指定した追加比較も、デモ4件はコード `28` で拒否、control成功、終了コード `0`。
+前回の同条件では4/4成功していた。`REQUESTS_CA_BUNDLE` 指定時のコード `20` とは異なり、今回も `SSL_CERT_FILE` によるCA切替の証拠にはならない。
+
+### 結果の解釈と実行記録
+
+CAファイル・OpenSSL・依存パッケージが同じまま、前回接続できた4クライアントがコード `28` で拒否するようになった。
+これはCPythonの中間CA公開鍵ブロックによる対策が、今回使った各クライアントの接続経路にも効いたことを支持する。
+コード `28` 自体は一般的な証明書拒否コードなので、それ単独で原因を断定せず、変更内容と比較条件を合わせて解釈する。
+certifiを使う3クライアントは引き続きコード `20`、httpx2の既定は引き続きmacOSのブロックとなった。
+Homebrew指定では全クライアントがコード `20`。修正のコールバックは既存のOpenSSL検証エラーを上書きしないため、この結果とも整合する。
+今回も対象はこの4デモチェーンと各スクリプトが通った経路に限り、HTTP/2・HTTP/3を個別に強制した検証はしていない。
+
+[全17条件の実行ログ](results/2026-10-27-python-3.14.10.txt)に、日時・実行コマンド・CA環境変数・Python/OpenSSL・依存パッケージ・各ホストの結果・終了コードを保存した。
+再実行例（リポジトリルート）:
+
+```sh
+env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE \
+  UV_CACHE_DIR=/private/tmp/emudhra-uv-cache \
+  uv run --python 3.14.10 emudhra-we-have-a-problem/urllib_checker.py --verbose
+
+env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE \
+  SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem \
+  UV_CACHE_DIR=/private/tmp/emudhra-uv-cache \
+  uv run --python 3.14.10 emudhra-we-have-a-problem/urllib_checker.py --verbose
+```
+
+## 前回の記録（2026-10-25 / Python 3.14.9）
+
 2026-10-25（JST）に、uv の python-build-standalone と各HTTPクライアントの既定の証明書検証で実測した記録。
 [デモサイト](https://emudhra.we-have-a-problem.com/)の4チェーンを調べる。
 この結果を、ライブラリの全バージョン・全OS・すべての侵害された中間CAへの評価には一般化しない。

@@ -1,0 +1,410 @@
+eMudhra TLS rerun: 2026-10-27 JST; CPython 3.14.10
+uv 0.13.6 (329bf9448 2026-10-26 aarch64-apple-darwin)
+macOS 26.7.1 / build 25G241 / Apple Silicon
+OpenSSL 3.5.9 29 Sep 2026
+System PEM SHA-256: 9dae8d76e55cb08991f2b672d58999ea15560d910759c16b544f843bdffbb994
+Homebrew PEM SHA-256: 19092144dab12d4ac3d3e5fbcf6a11cbac12b536e32c4ba8cc7d03da8f6de066
+Initial sandbox runs failed DNS resolution; these are the successful reruns outside the sandbox.
+
+=== urllib / default ===
+Started: 2026-10-27T11:43:24.646409+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/urllib_checker.py --verbose
+Exit code: 0
+stdout:
+[REVIEW REQUIRED] Certificate verification rejected all demo chains (4/4)
+Review the reasons below to confirm they match the expected rejection.
+Expiry or hostname mismatch alone does not establish that this issue is fixed.
+
+Python: 3.14.10
+CA file resolved: /private/etc/ssl/cert.pem
+Control (www.python.org): connection succeeded
+Results: 0 accepted / 4 certificate rejections / 0 inconclusive
+Rejection reason (4 connections): code=28: certificate rejected
+
+--- Details ---
+Python executable: /Users/nikkie/.local/share/uv/python/cpython-3.14.10-macos-aarch64-none/bin/python3.14
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+Default CA paths: DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+Verifier: ssl.create_default_context() defaults
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+Scope: direct connections using stdlib ssl; (pip, uv, and Requests are not tested.)
+
+=== urllib / homebrew ===
+Started: 2026-10-27T11:43:24.646778+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/urllib_checker.py --verbose
+Exit code: 0
+stdout:
+[REVIEW REQUIRED] Certificate verification rejected all demo chains (4/4)
+Review the reasons below to confirm they match the expected rejection.
+Expiry or hostname mismatch alone does not establish that this issue is fixed.
+
+Python: 3.14.10
+CA file resolved: /opt/homebrew/etc/ca-certificates/cert.pem
+Control (www.python.org): connection succeeded
+Results: 0 accepted / 4 certificate rejections / 0 inconclusive
+Rejection reason (4 connections): code=20: unable to get local issuer certificate
+
+--- Details ---
+Python executable: /Users/nikkie/.local/share/uv/python/cpython-3.14.10-macos-aarch64-none/bin/python3.14
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+Default CA paths: DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+Verifier: ssl.create_default_context() defaults
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: direct connections using stdlib ssl; (pip, uv, and Requests are not tested.)
+
+=== requests / default ===
+Started: 2026-10-27T11:43:24.648488+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/requests_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/requests-checker-15ba90f1af76384c/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: certifi==2026.10.19, charset-normalizer==3.5.2, idna==3.20, requests==2.34.2, urllib3==2.8.0
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== requests / homebrew ===
+Started: 2026-10-27T11:43:24.648334+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache REQUESTS_CA_BUNDLE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/requests_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/requests-checker-15ba90f1af76384c/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: certifi==2026.10.19, charset-normalizer==3.5.2, idna==3.20, requests==2.34.2, urllib3==2.8.0
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE='/opt/homebrew/etc/ca-certificates/cert.pem'
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== httpx / default ===
+Started: 2026-10-27T11:43:29.812734+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/httpx_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/httpx-checker-0eb15d1552145eb5/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcore==1.0.9, httpx==0.28.1, idna==3.20, typing_extensions==4.16.0
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== httpx / homebrew ===
+Started: 2026-10-27T11:43:29.814937+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/httpx_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/httpx-checker-0eb15d1552145eb5/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcore==1.0.9, httpx==0.28.1, idna==3.20, typing_extensions==4.16.0
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== aiohttp / default ===
+Started: 2026-10-27T11:43:29.827045+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/aiohttp_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/aiohttp-checker-6db4a69d8b092200/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: aiohappyeyeballs==2.7.1, aiohttp==3.14.5, aiosignal==1.4.0, attrs==26.1.0, frozenlist==1.8.0, idna==3.20, multidict==7.1.0, propcache==0.5.4, yarl==1.25.1
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== aiohttp / homebrew ===
+Started: 2026-10-27T11:43:29.838290+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/aiohttp_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/aiohttp-checker-6db4a69d8b092200/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: aiohappyeyeballs==2.7.1, aiohttp==3.14.5, aiosignal==1.4.0, attrs==26.1.0, frozenlist==1.8.0, idna==3.20, multidict==7.1.0, propcache==0.5.4, yarl==1.25.1
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== httpx2 / default ===
+Started: 2026-10-27T11:43:33.534395+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/httpx2_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/httpx2-checker-11a708a2bd5e1920/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: anyio==4.15.1, h11==0.16.0, httpcore2==2.16.0, httpx2==2.16.0, idna==3.20, truststore==0.10.5, typing_extensions==4.16.0
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=-67820: “dv-g3b-emudhra.we-have-a-problem.com” certificate is blocked
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=-67820: “dv-g3b-aaa-emudhra.we-have-a-problem.com” certificate is blocked
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=-67820: “dv-g3b-noct-emudhra.we-have-a-problem.com” certificate is blocked
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=-67820: “dv-g3b-aaa-noct-emudhra.we-have-a-problem.com” certificate is blocked
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== httpx2 / homebrew ===
+Started: 2026-10-27T11:43:33.536895+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/httpx2_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/httpx2-checker-11a708a2bd5e1920/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: anyio==4.15.1, h11==0.16.0, httpcore2==2.16.0, httpx2==2.16.0, idna==3.20, truststore==0.10.5, typing_extensions==4.16.0
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== httpxyz / default ===
+Started: 2026-10-27T11:43:35.602119+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/httpxyz_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/httpxyz-checker-0c7268d0fbaa4669/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcorexyz==1.2.1, httpxyz==0.42.1, idna==3.20, typing_extensions==4.16.0
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== httpxyz / homebrew ===
+Started: 2026-10-27T11:43:35.604263+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/httpxyz_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/httpxyz-checker-0c7268d0fbaa4669/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: anyio==4.15.1, certifi==2026.10.19, h11==0.16.0, httpcorexyz==1.2.1, httpxyz==0.42.1, idna==3.20, typing_extensions==4.16.0
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== niquests / default ===
+Started: 2026-10-27T11:43:37.199816+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/niquests_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/niquests-checker-a3e742eca74b7351/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: charset-normalizer==3.5.2, h11==0.16.0, jh2==5.0.15, niquests==3.21.2, qh3==2.0.4, urllib3-future==2.25.903, wassima==2.1.5
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== niquests / homebrew ===
+Started: 2026-10-27T11:43:37.726828+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache REQUESTS_CA_BUNDLE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/niquests_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/niquests-checker-a3e742eca74b7351/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: charset-normalizer==3.5.2, h11==0.16.0, jh2==5.0.15, niquests==3.21.2, qh3==2.0.4, urllib3-future==2.25.903, wassima==2.1.5
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE='/opt/homebrew/etc/ca-certificates/cert.pem'
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== urllib3 / default ===
+Started: 2026-10-27T11:43:39.173419+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache uv run --python 3.14.10 emudhra-we-have-a-problem/urllib3_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/urllib3-checker-7a70e1e0d2718657/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/private/etc/ssl/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: urllib3==2.8.0
+SSL_CERT_FILE=None
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== urllib3 / homebrew ===
+Started: 2026-10-27T11:43:39.240950+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/urllib3_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/urllib3-checker-7a70e1e0d2718657/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: urllib3==2.8.0
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=20: unable to get local issuer certificate
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
+
+=== niquests / ssl-cert-file-only ===
+Started: 2026-10-27T11:43:41.368531+09:00
+Command: env -u SSL_CERT_FILE -u SSL_CERT_DIR -u REQUESTS_CA_BUNDLE -u CURL_CA_BUNDLE UV_CACHE_DIR=/private/tmp/emudhra-uv-cache SSL_CERT_FILE=/opt/homebrew/etc/ca-certificates/cert.pem uv run --python 3.14.10 emudhra-we-have-a-problem/niquests_checker.py
+Exit code: 0
+stdout:
+Python: 3.14.10 /private/tmp/emudhra-uv-cache/environments-v2/niquests-checker-a3e742eca74b7351/bin/python
+OpenSSL: OpenSSL 3.5.9 29 Sep 2026
+stdlib default CA paths (not necessarily this client's CA source): DefaultVerifyPaths(cafile='/opt/homebrew/etc/ca-certificates/cert.pem', capath='/private/etc/ssl/certs', openssl_cafile_env='SSL_CERT_FILE', openssl_cafile='/private/etc/ssl/cert.pem', openssl_capath_env='SSL_CERT_DIR', openssl_capath='/private/etc/ssl/certs')
+Packages: charset-normalizer==3.5.2, h11==0.16.0, jh2==5.0.15, niquests==3.21.2, qh3==2.0.4, urllib3-future==2.25.903, wassima==2.1.5
+SSL_CERT_FILE='/opt/homebrew/etc/ca-certificates/cert.pem'
+SSL_CERT_DIR=None
+REQUESTS_CA_BUNDLE=None
+CURL_CA_BUNDLE=None
+Proxy: disabled; redirects: disabled; TLS verification: library default
+[REVIEW REQUIRED] 0 accepted / 4 certificate rejections / 0 inconclusive
+CONTROL ACCEPTED www.python.org: TLS succeeded; HTTP 200
+REJECTED dv-g3b-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+REJECTED dv-g3b-aaa-noct-emudhra.we-have-a-problem.com: code=28: certificate rejected
+Scope: these four demo chains only; rejection reasons require review.
+Expiry/hostname errors alone do not establish distrust of compromised intermediates.
