@@ -1,0 +1,86 @@
+[
+  {
+    "library": "httpx",
+    "pool": false,
+    "requests": 5,
+    "tcp_connections": 5,
+    "http": "1.1"
+  },
+  {
+    "library": "httpx",
+    "pool": true,
+    "requests": 5,
+    "tcp_connections": 1,
+    "http": "1.1"
+  },
+  {
+    "library": "httpxyz",
+    "pool": false,
+    "requests": 5,
+    "tcp_connections": 5,
+    "http": "1.1"
+  },
+  {
+    "library": "httpxyz",
+    "pool": true,
+    "requests": 5,
+    "tcp_connections": 1,
+    "http": "1.1"
+  },
+  {
+    "library": "httpx2",
+    "pool": false,
+    "requests": 5,
+    "tcp_connections": 5,
+    "http": "1.1"
+  },
+  {
+    "library": "httpx2",
+    "pool": true,
+    "requests": 5,
+    "tcp_connections": 1,
+    "http": "1.1"
+  },
+  {
+    "library": "niquests-10",
+    "pool": false,
+    "requests": 5,
+    "tcp_connections": 5,
+    "http": "1.1"
+  },
+  {
+    "library": "niquests-10",
+    "pool": true,
+    "requests": 5,
+    "tcp_connections": 1,
+    "http": "1.1"
+  },
+  {
+    "library": "niquests-100",
+    "pool": false,
+    "requests": 5,
+    "tcp_connections": 5,
+    "http": "1.1"
+  },
+  {
+    "library": "niquests-100",
+    "pool": true,
+    "requests": 5,
+    "tcp_connections": 1,
+    "http": "1.1"
+  },
+  {
+    "library": "aiohttp",
+    "pool": false,
+    "requests": 5,
+    "tcp_connections": 5,
+    "http": "1.1"
+  },
+  {
+    "library": "aiohttp",
+    "pool": true,
+    "requests": 5,
+    "tcp_connections": 1,
+    "http": "1.1"
+  }
+]

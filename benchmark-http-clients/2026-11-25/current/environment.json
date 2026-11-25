@@ -1,0 +1,52 @@
+{
+  "python": "3.13.7 (main, Sep 18 2025, 19:47:49) [Clang 20.1.4 ]",
+  "platform": "Linux-6.8.0-1060-aws-x86_64-with-glibc2.35",
+  "configuration": {
+    "lib": [
+      "httpx",
+      "httpxyz",
+      "httpx2",
+      "niquests-10",
+      "niquests-100",
+      "aiohttp"
+    ],
+    "rounds": 5,
+    "serial_requests": 1000,
+    "batches": 10,
+    "batch_size": 100,
+    "warmup": 100,
+    "workers": 10,
+    "port": 8888,
+    "seed": 20260922,
+    "output": "results-linux/current",
+    "update_readme": false
+  },
+  "packages": {
+    "httpxyz": "0.42.1",
+    "httpx2": "2.16.2",
+    "attrs": "26.1.0",
+    "anyio": "4.16.0",
+    "charset-normalizer": "3.5.3",
+    "httpcore2": "2.16.2",
+    "aiohttp": "3.14.5",
+    "multidict": "7.2.1",
+    "h11": "0.16.0",
+    "qh3": "2.1.0",
+    "niquests": "3.21.3",
+    "urllib3-future": "2.25.907",
+    "wassima": "2.1.5",
+    "truststore": "0.10.5",
+    "httpx": "0.28.1",
+    "httpcore": "1.0.9",
+    "jh2": "5.0.15",
+    "typing_extensions": "4.16.0",
+    "aiohappyeyeballs": "2.7.1",
+    "aiosignal": "1.4.0",
+    "idna": "3.20",
+    "httpcorexyz": "1.2.1",
+    "propcache": "0.5.4",
+    "frozenlist": "1.8.0",
+    "certifi": "2026.11.20",
+    "yarl": "1.25.1"
+  }
+}
