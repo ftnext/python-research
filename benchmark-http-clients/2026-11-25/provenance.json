@@ -1,0 +1,24 @@
+{
+  "benchmark_commit": "09606418cf8d8f45968b20e5a6d03dd783109b1e",
+  "benchmark_sha256": "468402bfa146f9d5346b29e3faa535d98226c49131dbbda8a36a14ef760e22fe",
+  "host": {
+    "os": "Ubuntu 22.04.5 LTS",
+    "architecture": "x86_64",
+    "cpu_model": "Intel(R) Xeon(R) Processor",
+    "available_vcpus": 8
+  },
+  "runs": [
+    {
+      "name": "locked",
+      "requirements": "requirements.lock.txt",
+      "requirements_sha256": "a317446167a056c44caf358e10ef7e03ed42993eabd95b96be9f162b5785db63",
+      "command": "python -u benchmark.py --workers 10 --output results-linux/locked"
+    },
+    {
+      "name": "current",
+      "requirements": "results-linux/current/requirements.lock.txt",
+      "requirements_sha256": "93d5b0f06e4d562f942c29d744b45697dd9aabb29090ea0305287e2e5601c8cd",
+      "command": "python -u benchmark.py --workers 10 --output results-linux/current"
+    }
+  ]
+}
